@@ -159,7 +159,9 @@ export const filteredProducts = async (req, res) => {
     //   category: ["dfgsdfgadsfga", "gffdksksdjfh"],
     //   price: { $gte: radio[0], $lte: radio[1] },
     // });
-    const products = await Product.find(args);
+    const products = await Product.find(args)
+      .select("-photo")
+      .sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
     console.log(err);
@@ -177,7 +179,7 @@ export const productsCount = async (req, res) => {
 
 export const listProducts = async (req, res) => {
   try {
-    const perPage = 3;
+    const perPage = 8;
     const page = req.params.page ? req.params.page : 1;
 
     const products = await Product.find({})
@@ -202,6 +204,23 @@ export const productsSearch = async (req, res) => {
       ],
     }).select("-photo");
     res.json(results);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const relatedProducts = async (req, res) => {
+  try {
+    const { productId, categoryId } = req.params;
+    const related = await Product.find({
+      category: categoryId,
+      _id: { $ne: productId },
+    })
+      .select("-photo")
+      .populate("category")
+      .limit(3);
+
+    res.json(related);
   } catch (err) {
     console.log(err);
   }
