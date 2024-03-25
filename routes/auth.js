@@ -1,6 +1,12 @@
 import express from "express";
 // import from controller
-import { register, login, secret } from "../controllers/auth.js";
+import {
+  register,
+  login,
+  secret,
+  updateProfile,
+  getOrders,
+} from "../controllers/auth.js";
 import { requireSignin, isAdmin } from "../middlewares/requireSignin.js";
 
 const router = express.Router();
@@ -14,6 +20,8 @@ router.get("/auth-check", requireSignin, (req, res) => {
 router.get("/admin-check", requireSignin, isAdmin, (req, res) => {
   res.json({ ok: true });
 });
+router.put("/profile", requireSignin, updateProfile);
+router.get("/orders", requireSignin, getOrders);
 
 // testing
 router.get("/secret", requireSignin, isAdmin, secret);

@@ -1,6 +1,7 @@
 import Product from "../medels/product.js";
 import slugify from "slugify";
 import fs from "fs";
+import Order from "../medels/order.js";
 
 export const create = async (req, res) => {
   try {
@@ -9,6 +10,8 @@ export const create = async (req, res) => {
     const { name, description, price, category, quantity, shipping } =
       req.fields;
     const { photo } = req.files;
+
+    console.log(req);
 
     //   validation
     switch (true) {
@@ -223,5 +226,36 @@ export const relatedProducts = async (req, res) => {
     res.json(related);
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const newTransaction = async (req, res) => {
+  try {
+    const { cart } = req.body;
+
+    let productId = [...cart?.map((p) => p._id)];
+    const payment = cart.reduce((prev, current) => {
+      return prev + current.price;
+    }, 0);
+    const newOrder = new Order({
+      products: productId,
+      payment,
+      buyer: req.user._id,
+    });
+    await newOrder.save();
+    // Decrement Quantity
+    const bulkOps = cart.map((item) => {
+      return {
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $inc: { quantity: -0, sold: +1 } },
+        },
+      };
+    });
+    Product.bulkWrite(bulkOps, {});
+    res.json({ ok: true });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ error: err.message });
   }
 };
