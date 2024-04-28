@@ -6,6 +6,7 @@ import {
   secret,
   updateProfile,
   getOrders,
+  allOrders,
 } from "../controllers/auth.js";
 import { requireSignin, isAdmin } from "../middlewares/requireSignin.js";
 
@@ -22,6 +23,7 @@ router.get("/admin-check", requireSignin, isAdmin, (req, res) => {
 });
 router.put("/profile", requireSignin, updateProfile);
 router.get("/orders", requireSignin, getOrders);
+router.get("/all-orders", requireSignin, isAdmin, allOrders);
 
 // testing
 router.get("/secret", requireSignin, isAdmin, secret);

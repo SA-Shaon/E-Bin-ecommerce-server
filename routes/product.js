@@ -19,6 +19,7 @@ import {
   productsSearch,
   relatedProducts,
   newTransaction,
+  orderStatus,
 } from "../controllers/product.js";
 
 router.post("/product", requireSignin, isAdmin, formidable(), create);
@@ -33,5 +34,6 @@ router.get("/list-products/:page", listProducts);
 router.get("/products/search/:keyword", productsSearch);
 router.get("/related-products/:productId/:categoryId", relatedProducts);
 router.post("/order/newTransaction", requireSignin, newTransaction);
+router.put("/order-status/:orderId", requireSignin, isAdmin, orderStatus);
 
 export default router;

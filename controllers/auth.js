@@ -127,10 +127,23 @@ export const getOrders = async (req, res) => {
   try {
     const orders = await Order.find({ buyer: req.user._id })
       .populate("products", "-photo")
-      .populate("buyer", "name");
+      .populate("buyer", "name")
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (err) {
     res.json({ error: err.message });
+  }
+};
+
+export const allOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate("products", "-photo")
+      .populate("buyer", "name")
+      .sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.log(err);
   }
 };
 

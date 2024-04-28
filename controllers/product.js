@@ -157,7 +157,7 @@ export const filteredProducts = async (req, res) => {
     if (checked.length) args.category = checked;
     if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
 
-    console.log("args => ", args);
+    // console.log("args => ", args);
     // const products = await Product.find({
     //   category: ["dfgsdfgadsfga", "gffdksksdjfh"],
     //   price: { $gte: radio[0], $lte: radio[1] },
@@ -257,5 +257,16 @@ export const newTransaction = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(400).json({ error: err.message });
+  }
+};
+
+export const orderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(orderId, { status });
+    res.json(order);
+  } catch (err) {
+    console.log(err);
   }
 };
