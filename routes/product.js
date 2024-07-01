@@ -20,6 +20,7 @@ import {
   relatedProducts,
   newTransaction,
   orderStatus,
+  createConfirmIntent,
 } from "../controllers/product.js";
 
 router.post("/product", requireSignin, isAdmin, formidable(), create);
@@ -35,5 +36,6 @@ router.get("/products/search/:keyword", productsSearch);
 router.get("/related-products/:productId/:categoryId", relatedProducts);
 router.post("/order/newTransaction", requireSignin, newTransaction);
 router.put("/order-status/:orderId", requireSignin, isAdmin, orderStatus);
+router.post("/createIntent", createConfirmIntent);
 
 export default router;

@@ -2,6 +2,7 @@ import Product from "../medels/product.js";
 import slugify from "slugify";
 import fs from "fs";
 import Order from "../medels/order.js";
+import Stripe from "stripe";
 
 export const create = async (req, res) => {
   try {
@@ -53,7 +54,6 @@ export const list = async (req, res) => {
     const products = await Product.find({})
       .populate("category") // Load category data from db
       .select("-photo")
-      .limit(12)
       .sort({ createdAt: -1 });
     res.json(products);
   } catch (err) {
@@ -269,4 +269,19 @@ export const orderStatus = async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+};
+
+const stripe = new Stripe(process.env.STRIPE_SECRET);
+// Stripe Integration
+export const createConfirmIntent = async (req, res) => {
+  // const amount = parseInt(price * 100);
+  console.log(req);
+
+  // const paymentIntent = await stripe.paymentIntents.create({
+  //   amount,
+  //   currency: "usd",
+  //   payment_method_types: ["card"],
+  // });
+
+  // res.send({ clientSecret: paymentIntent.client_secret });
 };
