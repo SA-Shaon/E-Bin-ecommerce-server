@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 const { ObjectId } = mongoose.Schema;
 
 const productSchema = new mongoose.Schema(
@@ -42,9 +43,10 @@ const productSchema = new mongoose.Schema(
       data: Buffer,
       contentType: String,
     },
-    shipping: {
-      required: false,
-      type: Boolean,
+    machine: {
+      type: Number,
+      required: true,
+      default: 1,
     },
   },
   { timestamps: true }

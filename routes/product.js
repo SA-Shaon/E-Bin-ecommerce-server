@@ -36,6 +36,6 @@ router.get("/products/search/:keyword", productsSearch);
 router.get("/related-products/:productId/:categoryId", relatedProducts);
 router.post("/order/newTransaction", requireSignin, newTransaction);
 router.put("/order-status/:orderId", requireSignin, isAdmin, orderStatus);
-router.post("/createIntent", createConfirmIntent);
+router.post("/create-intent", requireSignin, createConfirmIntent);
 
 export default router;

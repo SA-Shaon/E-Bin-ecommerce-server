@@ -8,7 +8,7 @@ export const create = async (req, res) => {
   try {
     // console.log(req.fields);
     // console.log(req.files);
-    const { name, description, price, category, quantity, shipping } =
+    const { name, description, price, category, quantity, machine } =
       req.fields;
     const { photo } = req.files;
 
@@ -26,8 +26,8 @@ export const create = async (req, res) => {
         return res.json({ error: "category is required" });
       case !quantity:
         return res.json({ error: "Quantity is required" });
-      case !shipping:
-        return res.json({ error: "Shipping is required" });
+      case !machine:
+        return res.json({ error: "Machine is required" });
       case photo && photo.size > 1000000:
         return res.json({ error: "Image should be less than 1mb in size" });
     }
@@ -94,6 +94,7 @@ export const remove = async (req, res) => {
     const removed = await Product.findOneAndDelete(req.params.productId).select(
       "-photo"
     );
+    console.log(removed);
     res.json(removed);
   } catch (err) {
     console.log(err);
@@ -103,7 +104,7 @@ export const remove = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const { name, description, price, category, quantity, shipping } =
+    const { name, description, price, category, quantity, machine } =
       req.fields;
     const { photo } = req.files;
 
@@ -119,8 +120,8 @@ export const update = async (req, res) => {
         res.json({ error: "category is required" });
       case !quantity:
         res.json({ error: "Quantity is required" });
-      case !shipping:
-        res.json({ error: "Shipping is required" });
+      case !machine:
+        res.json({ error: "Machine is required" });
       case photo && photo.size > 1000000:
         res.json({ error: "Image should be less than 1mb in size" });
     }
@@ -231,7 +232,7 @@ export const relatedProducts = async (req, res) => {
 
 export const newTransaction = async (req, res) => {
   try {
-    const { cart } = req.body;
+    const { cart, paymentIntent } = req.body;
 
     let productId = [...cart?.map((p) => p._id)];
     const payment = cart.reduce((prev, current) => {
@@ -240,6 +241,12 @@ export const newTransaction = async (req, res) => {
     const newOrder = new Order({
       products: productId,
       payment,
+      paymentIntent: {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+      },
       buyer: req.user._id,
     });
     await newOrder.save();
@@ -271,17 +278,24 @@ export const orderStatus = async (req, res) => {
   }
 };
 
-const stripe = new Stripe(process.env.STRIPE_SECRET);
+const stripe = new Stripe(
+  "sk_test_51PXgipIdwBFMNmQQUcPWX9Xj7jgq6ZwK8wCqj0DauGo18KQJ9IlrFABVsx2WDsROX5qehPFtOT4PIYMJXLelV5NL00ryj3n3GJ"
+);
+
 // Stripe Integration
 export const createConfirmIntent = async (req, res) => {
-  // const amount = parseInt(price * 100);
-  console.log(req);
+  try {
+    const { price } = req.body;
+    const amount = parseInt(price * 100);
 
-  // const paymentIntent = await stripe.paymentIntents.create({
-  //   amount,
-  //   currency: "usd",
-  //   payment_method_types: ["card"],
-  // });
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
 
-  // res.send({ clientSecret: paymentIntent.client_secret });
+    res.send({ clientSecret: paymentIntent.client_secret });
+  } catch (err) {
+    console.log(err);
+  }
 };
